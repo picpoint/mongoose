@@ -6,113 +6,110 @@ const port = process.env.port || 4000;
 let jsonParser = bodyParser.json();
 const mongoose = require('mongoose');
 
-
 app.use(express.static('public'));
 
-const userSchema = mongoose.Schema({
-  user: {
-    firstName: String,
-    lastName: String
-  },
-  created: Date
-});
-
-const authorSchema = mongoose.Schema({
+const provisionerSchema = mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
-  name: {
-    firstName: String,
-    lastName: String
-  },
-  biography: String,
-  twitter: String,
-  facebook: String,
-  prifilePicture: Buffer,
-  created: {
-    type: Date,
-    default: Date.now
-  }
-});
-
-const bookSchema = mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  title: String,
-  summary: String,
-  isbn: String,
-  thumbnail: Buffer,
-  author: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Author'
-  },
-  raitings: [
+  companyName: String,
+  adress: [
     {
-      summary: String,
-      detail: String,
-      numberOfStars: Number,
-      created: {
-        type: Date,
-        default: Date.now
-      }
+      city: String,
+      region: String,
+      postIndex: Number,
+      telephone: Number
     }
   ],
+  logo: Buffer,
+  created: {
+    type: Date,
+    default: Date.now
+  }  
+});
+
+const productSchema = mongoose.Schema({
+  _id: mongoose.Schema.Types.ObjectId,
+  title: String,
+  metall: String,
+  metallSample: Number,
+  pictOfProduct: Buffer,
+  proviss: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Provissioner'
+  },
   created: {
     type: Date,
     default: Date.now
   }
 });
 
-let Author = mongoose.model('Author', authorSchema);
-let Book = mongoose.model('Book', bookSchema);
+let Provissioner = mongoose.model('Provissioner', provisionerSchema);
+let Product = mongoose.model('Product', productSchema);
 
 
-let jamieAuthor = new Author ({
+let alkor = new Provissioner({
   _id: new mongoose.Types.ObjectId(),
-  name: {
-    firstName: 'Jamie',
-    lastName: 'Munro'
-  },
-  biography: 'Jamie is the author of ASP.NET MVC 5 with Bootstrap and',
-  twitter: 'https://twitter.com/endyourif',
-  facebook: 'https://www.facebook.com/End-Your-If-194251957252562/'
+  companyName: 'Alkor',
+  adress: [{
+    city: 'Moscow',
+    region: 'Moscow region',
+    postIndex: 355000,
+    telephone: 8800555700
+  }]
 });
 
-
-
-jamieAuthor.save((err) => {
+alkor.save((err) => {
   if(err) {
-    throw new Error('***ERR TO SAVE AUTHOR***');
+    throw new Error('***ERR TO SAVE ALKOR***');
+  } else {
+    console.log('ALKOR SAVE TO SUCCESSFULLY');
   }
-
-  let mvcBook = new Book({
-    _id: new mongoose.Types.ObjectId(),
-    title: 'ASP.NET MVC 5 with Bootstrap and Knockout.js',
-    author: jamieAuthor._id,
-    raitings: [{
-      summary: 'Gread read'
-    }]
-  });
-
-  mvcBook.save((err) => {
-    if(err) {
-      throw new Error('***ERR TO SAVE BOOK MVC***');
-    }
-  });
-
-
-  let knockoutBook = new Book({
-    _id: new mongoose.Types.ObjectId(),
-    title: 'Knockout.js: Building Dynamic Client-Side Web Applications',
-    author: jamieAuthor._id
-  });
-
-  knockoutBook.save((err) => {
-    if(err) {
-      throw new Error('***ERR TO SAVE BOOK KNOCKOUT***');
-    }
-  });
-
 });
 
 
+
+let ring = new Product({
+  _id: new mongoose.Types.ObjectId(),
+  title: 'RING',
+  metall: 'silver',
+  metallSample: 925,
+  proviss: alkor._id
+});
+
+ring.save((err) => {
+  if(err) {
+    throw new Error('***ERR TO SAVE RING***');
+  } else {
+    console.log('RING SAVE TO SUCCESSFULLY');
+  }
+});
+
+let pendent = new Product({
+  _id: new mongoose.Types.ObjectId(),
+  title: 'PENDENT',
+  metall: 'GOLD',
+  metallSample: 585,
+  proviss: alkor._id
+});
+
+pendent.save((err) => {
+  if (err) {
+    throw new Error('***ERR TO SAVE PENDENT***');
+  } else {
+    console.log('PENDENT SUCCESSFULLY');
+  }
+});
+
+
+Product.findByIdAndUpdate('5db0a9b05f32a43eb7d080ac', 
+{metall: 'SILVER/GOLD'},
+  (err, product) => {
+    if(err) {
+      throw new Error('***ERR TO UPDATE PRODUCT***');
+    } else {
+      console.log(product);
+    }
+  }
+);
 
 
 
@@ -125,11 +122,6 @@ mongoose.connect(urlMongoDB, {useNewUrlParser: true}, (err) => {
   }
   console.log('--- connect succesfully ---');
 });
-
-
-
-
-
 
 
 
