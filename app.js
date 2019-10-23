@@ -10,9 +10,9 @@ const mongoose = require('mongoose');
 app.use(express.static('public'));
 
 const userSchema = mongoose.Schema({
-  name: {
-    firstname: String,
-    lastname: String
+  user: {
+    firstName: String,
+    lastName: String
   },
   created: Date
 });
@@ -20,13 +20,13 @@ const userSchema = mongoose.Schema({
 const authorSchema = mongoose.Schema({
   _id: mongoose.Schema.Types.ObjectId,
   name: {
-    firstname: String,
-    lastname: String
+    firstName: String,
+    lastName: String
   },
   biography: String,
   twitter: String,
   facebook: String,
-  profilePictures: Buffer,
+  prifilePicture: Buffer,
   created: {
     type: Date,
     default: Date.now
@@ -45,7 +45,7 @@ const bookSchema = mongoose.Schema({
   },
   raitings: [
     {
-      symmary: String,
+      summary: String,
       detail: String,
       numberOfStars: Number,
       created: {
@@ -62,6 +62,60 @@ const bookSchema = mongoose.Schema({
 
 let Author = mongoose.model('Author', authorSchema);
 let Book = mongoose.model('Book', bookSchema);
+
+
+let jamieAuthor = new Author ({
+  _id: new mongoose.Types.ObjectId(),
+  name: {
+    firstName: 'Jamie',
+    lastName: 'Munro'
+  },
+  biography: 'Jamie is the author of ASP.NET MVC 5 with Bootstrap and',
+  twitter: 'https://twitter.com/endyourif',
+  facebook: 'https://www.facebook.com/End-Your-If-194251957252562/'
+});
+
+
+
+jamieAuthor.save((err) => {
+  if(err) {
+    throw new Error('***ERR TO SAVE AUTHOR***');
+  }
+
+  let mvcBook = new Book({
+    _id: new mongoose.Types.ObjectId(),
+    title: 'ASP.NET MVC 5 with Bootstrap and Knockout.js',
+    author: jamieAuthor._id,
+    raitings: [{
+      summary: 'Gread read'
+    }]
+  });
+
+  mvcBook.save((err) => {
+    if(err) {
+      throw new Error('***ERR TO SAVE BOOK MVC***');
+    }
+  });
+
+
+  let knockoutBook = new Book({
+    _id: new mongoose.Types.ObjectId(),
+    title: 'Knockout.js: Building Dynamic Client-Side Web Applications',
+    author: jamieAuthor._id
+  });
+
+  knockoutBook.save((err) => {
+    if(err) {
+      throw new Error('***ERR TO SAVE BOOK KNOCKOUT***');
+    }
+  });
+
+});
+
+
+
+
+
 
 const urlMongoDB = 'mongodb+srv://rmtar:rmtar@usersdb-zepwb.mongodb.net/usersdb?retryWrites=true&w=majority';
 
